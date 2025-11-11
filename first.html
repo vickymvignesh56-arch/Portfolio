@@ -1,0 +1,39 @@
+<html>
+
+<head>
+
+<title>My First Page</title></head>
+
+
+<body  style="background-color:powderblue">
+
+<h1 id="v"style="color:red">Welcome My Page</h1>
+
+<p id="p1">  </p>
+
+
+
+
+
+<script>
+
+
+function Person(first, last, age, eye) {
+  this.firstName = first;
+  this.lastName = last;
+  this.age = age;
+  this.eyeColor = eye;
+}
+
+// Create a Person object
+const myFather = new Person("John", "Doe", 50, "blue");
+
+// Display age
+document.getElementById("p1").innerHTML =
+"My father is " + myFather.age + "."; 
+
+</script>
+
+
+</body>
+</html>

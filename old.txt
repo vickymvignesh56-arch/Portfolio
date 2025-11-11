@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vignesh M | Profile</title>
+  <style>
+    /* ---------- Base ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    html, body { height: 100%; }
+    /* Use the same gradient as the loading screen across the whole page */
+    body {
+      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+      color: #ffffff;
+      overflow-x: hidden;
+      min-height: 100vh;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: 60px;
+    }
+
+    /* ------------------- LOADING SCREEN ------------------- */
+    #loading-screen {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      z-index: 9999; text-align: center;
+    }
+    #loading-screen h1 { font-size: 42px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+    #loading-screen h2 { font-size: 22px; color: #dcdcdc; margin-bottom: 20px; }
+    .loader {
+      border: 8px solid rgba(255,255,255,0.3);
+      border-top: 8px solid #ffd700;
+      border-radius: 50%;
+      width: 70px; height: 70px;
+      animation: spin 1s linear infinite;
+      margin-top: 10px;
+    }
+    @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+    #progress { margin-top: 20px; font-size: 18px; color: #fff; }
+
+    /* ------------------- NAVBAR ------------------- */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      background-color: rgba(0,0,0,0.25);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 10; backdrop-filter: blur(6px);
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 15px 40px;
+      display: none; /* shown after loading */
+    }
+    .logo { font-size: 24px; font-weight: bold; color: #fff; }
+    .logo span { color: #ffd700; }
+    .nav-links { display: flex; gap: 30px; }
+    .nav-links a { text-decoration: none; color: #fff; font-weight: bold; transition: color 0.3s, transform 0.2s; }
+    .nav-links a:hover { color: #ffd700; transform: scale(1.1); }
+
+    /* ------------------- HERO SECTION ------------------- */
+    .hero { display: none; justify-content: center; align-items: center; padding-top: 150px; flex-wrap: wrap; animation: fadeIn 1.5s ease forwards; }
+    .hero img { width: 280px; height: 280px; border-radius: 20px; object-fit: cover; margin-right: 50px; box-shadow: 0 0 25px rgba(255,255,255,0.15); }
+    .hero-content { max-width: 500px; text-align: left; }
+    .hero-content h1 { font-size: 55px; color: #ffd700; font-weight: 700; }
+    .hero-content h2 { color: #fff; font-size: 26px; margin: 10px 0 20px; min-height: 30px; }
+    .hero-content p { color: #f0f0f0; font-size: 18px; line-height: 1.7; margin-bottom: 30px; }
+    .buttons { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .btn { text-decoration: none; background: linear-gradient(135deg,#ffd700,#ff8800); padding: 12px 28px; color: #000; border-radius: 30px; font-weight: 600; transition: all 0.3s ease; }
+    .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #ffd700; }
+    .icon-links { display: flex; align-items: center; gap: 10px; }
+    .icon-links img { width: 34px; height: 34px; border-radius: 50%; background-color: #fff; padding: 6px; transition: transform 0.3s, box-shadow 0.3s; }
+    .icon-links img:hover { transform: scale(1.2); box-shadow: 0 0 10px #ffd700; }
+
+    /* ------------------- ABOUT SECTION ------------------- */
+    #about { padding: 120px 10%; color: #fff; display: none; animation: fadeIn 1.5s ease forwards; }
+    #about h2 { text-align: center; font-size: 40px; color: #ffd700; margin-bottom: 50px; font-weight: 700; }
+    .about-container { display: flex; flex-wrap: wrap; gap: 50px; align-items: flex-start; }
+    .about-left { flex: 1; min-width: 300px; }
+    .about-left h3 { font-size: 30px; color: #fff; margin-bottom: 20px; }
+    .about-left p { font-size: 17px; line-height: 1.8; color: #f0f0f0; }
+    .tags { margin-top: 20px; }
+    .tag { display: inline-block; background: rgba(255,255,255,0.08); color: #ffd700; padding: 6px 14px; border-radius: 20px; font-size: 14px; margin: 5px; border: 1px solid rgba(255,215,0,0.12); }
+    .about-right { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .card { background: rgba(255,255,255,0.08); padding: 25px; border-radius: 15px; transition: transform 0.3s, background 0.3s; }
+    .card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.14); }
+    .card h4 { color: #ffd700; font-size: 20px; margin-bottom: 10px; }
+    .card p { color: #eee; font-size: 15px; line-height: 1.6; }
+
+    /* ------------------- EDUCATION & EXPERIENCE ------------------- */
+    #education, #experience {
+      padding: 120px 8%;
+      text-align: center;
+      display: none;
+      animation: fadeIn 1.5s ease forwards;
+    }
+    #education h2, #experience h2 {
+      font-size: 40px;
+      color: #ffd700;
+      margin-bottom: 60px;
+      font-weight: 700;
+    }
+    .education-section, .experience-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+    }
+    .edu-card, .exp-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 30px;
+      width: 300px;
+      box-shadow: 0 0 15px rgba(255,215,0,0.12);
+      transition: all 0.3s ease;
+    }
+    .edu-card:hover, .exp-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 25px rgba(255,215,0,0.3);
+    }
+    .edu-card h3, .exp-card h3 { color: #fff; font-size: 22px; margin-bottom: 8px; }
+    .edu-card .year, .exp-card .year { font-size: 15px; color: #ffd700; font-weight: 600; margin-bottom: 8px; }
+    .edu-card .college, .exp-card .company { font-size: 16px; color: #ffe680; margin-bottom: 6px; }
+    .edu-card .location, .exp-card .location { font-size: 14px; color: #ddd; margin-bottom: 10px; }
+    .edu-card p, .exp-card p { font-size: 14px; color: #eee; line-height: 1.6; }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      position: relative;
+      padding: 40px 0;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: #ffd700;
+      transform: translateX(-50%);
+    }
+    .timeline-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      position: relative;
+    }
+    .timeline-left, .timeline-right {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 25px;
+      border-radius: 15px;
+      width: 45%;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.08);
+    }
+    .timeline-left h3, .timeline-right h3 { color: #ffd700; margin-bottom: 10px; }
+    .timeline-left .company, .timeline-right p { color: #fff; font-size: 16px; }
+    .timeline-left .year { color: #ccc; font-size: 14px; }
+    .timeline-right p, .timeline-right ul { color: #eee; font-size: 15px; line-height: 1.6; }
+    .timeline-right h4 { margin-top: 15px; color: #ffd700; }
+    .timeline-right ul { margin: 8px 0 15px 20px; }
+    .tech span {
+      display: inline-block;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,215,0,0.1);
+      color: #ffd700;
+      padding: 5px 10px;
+      border-radius: 12px;
+      margin: 3px;
+      font-size: 13px;
+    }
+
+    /* ---------- Projects slider & card ---------- */
+    .container {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 30px;
+    }
+    h1.page-title {
+      text-align: center;
+      color: #ffd7a6;
+      font-size: 24px;
+      letter-spacing: 0.6px;
+      margin-bottom: 28px;
+      opacity: 0.95;
+    }
+    .slider-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:14px;
+      padding: 36px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+    .slider-inner { display:flex; gap:28px; align-items:center; }
+    .project-visual { flex:0 0 420px; min-width:260px; height:260px; border-radius:10px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.1)); display:flex; align-items:center; justify-content:center; }
+    .project-visual img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .project-content { flex:1; min-width:320px; color:#e7d8e6; }
+    .project-title { font-size:34px; color:#ffd7a6; margin-bottom:12px; font-weight:700; }
+    .project-desc { color: #d7cbd6; line-height:1.7; margin-bottom:16px; }
+    .project-tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+    .project-actions { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn { background: linear-gradient(90deg,#5d122f,#8b1a53); color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+    .btn.secondary { background:transparent; color:#ffd7a6; border:1px solid rgba(255,215,150,0.08); }
+
+    .arrow {
+      width:44px; height:44px;
+      border-radius:50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+      color:#ffd7a6;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      border:1px solid rgba(255,255,255,0.03);
+      cursor:pointer;
+      transition: transform .12s, background .12s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .arrow:hover { transform:translateY(-50%) scale(1.05); background: rgba(255,255,255,0.03); }
+    .arrow.left { left:18px; }
+    .arrow.right { right:18px; }
+
+    .controls { display:flex; justify-content:center; gap:12px; margin-top:20px; align-items:center; }
+    .dots { display:flex; gap:8px; }
+    .dot { width:12px; height:12px; border-radius:50%; background: rgba(255,255,255,0.06); cursor:pointer; border:1px solid rgba(0,0,0,0.2); transition: background .12s, transform .12s; }
+    .dot.active { background:#ffd7a6; box-shadow: 0 6px 18px rgba(255,215,150,0.12); transform:scale(1.05); }
+    .autoplay-toggle { margin-left:18px; padding:8px 12px; font-size:14px; background:rgba(255,255,255,0.03); color:#ffd7a6; border-radius:10px; border:1px solid rgba(255,255,255,0.02); cursor:pointer; }
+
+    footer { text-align:center; padding:20px; background: rgba(0,0,0,0.12); color:#fff; margin-top:100px; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .hero { flex-direction: column; text-align: center; }
+      .hero img { margin: 0 0 30px 0; }
+      .hero-content { text-align: center; }
+      .buttons { justify-content: center; }
+    }
+    @media (max-width:980px){
+      .container{padding:18px;}
+      .slider-inner{flex-direction:column-reverse; gap:20px;}
+      .project-visual{width:100%; height:250px; min-width:0;}
+      .project-content{width:100%;}
+      .arrow.left{left:10px;}
+      .arrow.right{right:10px;}
+    }
+    @media (max-width:520px){
+      .project-visual{height:200px;}
+      .project-title{font-size:22px;}
+      .btn{padding:8px 10px; font-size:13px;}
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+    .typewriter { display:inline-block; border-right:3px solid #ffd700; white-space:nowrap; overflow:hidden; }
+  </style>
+</head>
+
+<body>
+  <!-- Loading Page -->
+  <div id="loading-screen">
+    <h1>Vignesh M</h1>
+    <h2>My Profile Application</h2>
+    <div class="loader"></div>
+    <div id="progress">Loading... 0%</div>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="logo">#<span>Vicky-Tech</span></div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#experience">Experience</a>
+      <a href="#project">Project</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <img src="C:\Users\M.Vignesh\Downloads\name.jpg.jpeg" alt="Vignesh M" />
+    <div class="hero-content">
+      <h1>Vignesh M</h1>
+      <h2><span class="typewriter"></span></h2>
+      <p>Passionate developer skilled in Java, Spring Boot, and front-end web technologies. I focus on crafting scalable, responsive, and efficient web and mobile applications that deliver real-world impact.</p>
+      <div class="buttons">
+        <a href="C:\Users\M.Vignesh\OneDrive\ドキュメント\resume\_M.Vignesh Java 2025  .pdf" download class="btn">⬇️ Resume</a>
+        <div class="icon-links">
+          <a href="https://github.com/vickymvignesh56-arch" target="_blank" title="GitHub"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" /></a>
+          <a href="https://www.linkedin.com/in/m-vignesh-4410422a8/" target="_blank" title="LinkedIn"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" /></a>
+          <a href="mailto:vickymvignesh56@gmail.com" title="Email"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <h2>About Me</h2>
+    <div class="about-container">
+      <div class="about-left">
+        <h3>Building Digital Solutions</h3>
+        <p>
+          I have completed a <b>Java Full Stack Development course at Payilagam Institute</b>
+          and an <b>Android Developer Internship at Netaxis IT Pvt Ltd</b>.<br><br>
+          I specialize in <b>Full Stack Development</b> and <b>Android App Development</b>,
+          passionate about building scalable, efficient, and user-focused applications.
+        </p>
+        <div class="tags">
+          <span class="tag">Java</span><span class="tag">Spring Boot</span><span class="tag">PostgreSQL</span>
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+          <span class="tag">Android</span><span class="tag">Kotlin</span>
+        </div>
+      </div>
+      <div class="about-right">
+        <div class="card"><h4>Full Stack Development</h4><p>Hands-on experience in Java, Spring Boot, and REST APIs for scalable web solutions.</p></div>
+        <div class="card"><h4>Android Development</h4><p>Experienced in building mobile apps using Java, Kotlin, Room Database.</p></div>
+        <div class="card"><h4>Web Technologies</h4><p>Proficient in HTML5, CSS3, and JavaScript with responsive and interactive designs.</p></div>
+        <div class="card"><h4>Problem Solving</h4><p>Analytical and logical thinker with a focus on effective and optimized solutions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section id="education">
+    <h2>Education</h2>
+    <div class="education-section">
+      <div class="edu-card">
+        <div class="year">Jun 2024 - Dec 2024</div>
+        <h3>Java Full Stack Development Course</h3>
+        <div class="college">Payilagam Institute</div>
+        <div class="location">Velachery, Chennai</div>
+        <p>Successfully completed a professional course focused on Java, Spring Boot, PostgreSQL, HTML, CSS, and JavaScript full stack development.</p>
+      </div>
+      <div class="edu-card">
+        <div class="year">2020 - 2024 | CGPA: 6.84</div>
+        <h3>B.Sc</h3><div class="college">A.V.V.M Sri Pushpam College</div><div class="location">Thanjavur</div>
+        <p>Completed B.Sc Mathematics from Bharathidasan University, Thanjavur.</p>
+      </div>
+      <div class="edu-card">
+        <div class="year">2018 - 2020 | 51%</div><h3>HSC</h3>
+        <div class="college">S.I. (B.M.S) Hr. Sec. School</div><div class="location">Thanjavur</div>
+        <p>Completed Higher Secondary with 51% from Shaukathul Islam (B.M.S) Hr. Sec. School, Thanjavur.</p>
+      </div>
+      <div class="edu-card">
+        <div class="year">2017 - 2018 | 70%</div><h3>SSLC</h3>
+        <div class="college">St. Antony's High School</div><div class="location">Pasupathikovil</div>
+        <p>Completed SSLC with 70% from St. Antony's High School, Pasupathikovil.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section id="experience">
+    <h2>Experience</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-left">
+          <h3>Android Developer Intern</h3>
+          <p class="company">Netaxis IT Pvt Ltd</p>
+          <p class="year">June - Oct 2025</p>
+        </div>
+        <div class="timeline-right">
+          <h3>Android Development Internship</h3>
+          <p>Developed Android apps using Java and Kotlin. Implemented Room Database and optimized UI/UX for better performance.</p>
+          <h4>Key Achievements:</h4>
+          <ul>
+            <li>Integrated Room Database efficiently</li>
+            <li>Enhanced UI/UX performance</li>
+            <li>Worked on real-time data features</li>
+          </ul>
+          <div class="tech">
+            <span>Java</span><span>Kotlin</span><span>Room DB</span><span>XML</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-left">
+          <h3>Java Full Stack Developer (Trainee)</h3>
+          <p class="company">Payilagam Institute</p>
+          <p class="year">2024</p>
+        </div>
+        <div class="timeline-right">
+          <h3>Java Full Stack Development Training</h3>
+          <p>Completed professional full-stack course covering both front-end and back-end technologies.</p>
+          <h4>Key Achievements:</h4>
+          <ul>
+            <li>Built scalable full-stack apps</li>
+            <li>Worked with RESTful APIs</li>
+            <li>Used Spring Boot & PostgreSQL</li>
+          </ul>
+          <div class="tech">
+            <span>Java</span><span>Spring Boot</span><span>PostgreSQL</span><span>HTML</span><span>CSS</span><span>JavaScript</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="project">
+    <div class="container">
+      <h1 class="page-title">A showcase of my recent work and personal projects</h1>
+
+      <div class="slider-card" id="sliderCard">
+        <div class="arrow left" id="prevBtn" title="Previous">&#10094;</div>
+        <div class="arrow right" id="nextBtn" title="Next">&#10095;</div>
+
+        <div class="slider-inner" id="slideViewport">
+          <div class="project-visual">
+            <img id="slideImage" src="images/student-management.jpg" alt="Project image">
+          </div>
+
+          <div class="project-content">
+            <div class="project-title" id="slideTitle">Student Management System</div>
+            <div class="project-desc" id="slideDesc">
+              A full stack web application to manage students, courses and attendance. Built with Java, Spring Boot and PostgreSQL; includes role-based access, CRUD operations and report export.
+            </div>
+
+            <div class="project-tags" id="slideTags">
+              <span class="tag">Java</span>
+              <span class="tag">Spring Boot</span>
+              <span class="tag">PostgreSQL</span>
+            </div>
+
+            <div class="project-actions" id="slideActions">
+              <a class="btn" href="#" target="_blank">View Demo</a>
+              <a class="btn secondary" href="https://github.com/vickymvignesh56-arch" target="_blank">Source</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:18px;">
+        <div class="dots" id="dots"></div>
+        <button class="autoplay-toggle" id="autoplayToggle">Auto-play OFF</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2025 Designed & Developed with 💛 by Vicky-Tech</footer>
+
+  <script>
+    let progress = 0;
+    const progressText = document.getElementById("progress");
+    const loadingScreen = document.getElementById("loading-screen");
+    const navbar = document.getElementById("navbar");
+    const hero = document.querySelector(".hero");
+    const about = document.getElementById("about");
+    const education = document.getElementById("education");
+    const experience = document.getElementById("experience");
+    const typewriter = document.querySelector(".typewriter");
+
+    const interval = setInterval(() => {
+      progress += 2;
+      progressText.textContent = `Loading... ${progress}%`;
+      if (progress >= 100) {
+        clearInterval(interval);
+        loadingScreen.style.display = "none";
+        // ensure the same loading-screen gradient remains as page background
+        document.body.style.background = "linear-gradient(135deg, #8e2de2, #4a00e0)";
+        navbar.style.display = "flex";
+        hero.style.display = "flex";
+        about.style.display = "block";
+        education.style.display = "block";
+        experience.style.display = "block";
+        typeEffect();
+      }
+    }, 50);
+
+    const roles = [
+      "Java Full Stack Developer",
+      "Android Developer",
+      "Back-end Developer",
+      "Web Developer"
+    ];
+    let index = 0;
+
+    function typeEffect() {
+      let text = roles[index];
+      let i = 0;
+      typewriter.textContent = "";
+      const typing = setInterval(() => {
+        typewriter.textContent += text[i];
+        i++;
+        if (i === text.length) {
+          clearInterval(typing);
+          setTimeout(() => {
+            eraseEffect();
+          }, 1500);
+        }
+      }, 100);
+    }
+
+    function eraseEffect() {
+      let text = typewriter.textContent;
+      let i = text.length - 1;
+      const erasing = setInterval(() => {
+        typewriter.textContent = text.substring(0, i);
+        i--;
+        if (i < 0) {
+          clearInterval(erasing);
+          index = (index + 1) % roles.length;
+          setTimeout(() => {
+            typeEffect();
+          }, 500);
+        }
+      }, 50);
+    }
+
+    const projects = [
+      {
+        id: 'student',
+        title: 'Student Management System',
+        desc: 'Full stack web app to manage students, built with Java, Spring Boot, PostgreSQL, responsive UI and role-based access.',
+        img: 'images/student-management.jpg',
+        tags: ['Java','Spring Boot','PostgreSQL','HTML','CSS']
+      },
+      {
+        id: 'busbooking',
+        title: 'Bus Booking System',
+        desc: 'End-to-end booking platform for searching routes, reserving seats and managing schedules. Built with Spring Boot backend and PostgreSQL.',
+        img: 'images/bus-booking.jpg',
+        tags: ['Java','Spring Boot','MySQL','REST API']
+      },
+      {
+        id: 'puzzle',
+        title: 'Puzzle Game App',
+        desc: 'A number puzzle Android game with multiple difficulty levels, save/resume and score tracking. Built using Java/Kotlin and Canvas/UI animations.',
+        img: 'images/puzzle-app.jpg',
+        tags: ['Android','Kotlin','Game Logic','Canvas']
+      },
+      {
+        id: 'gallery',
+        title: 'Gallery App',
+        desc: 'Photo gallery Android app with smooth loading, pinch-zoom, folder view and local caching using Room and Glide.',
+        img: 'images/gallery-app.jpg',
+        tags: ['Android','Kotlin','Room DB','Glide']
+      },
+      {
+        id: 'note',
+        title: 'Note App',
+        desc: 'Lightweight note-taking app with tagging, search and offline persistence using Room Database and MVVM architecture.',
+        img: 'images/note-app.jpg',
+        tags: ['Android','Kotlin','Room DB','MVVM']
+      },
+    ];
+
+    // DOM refs for slider
+    const slideImage = document.getElementById('slideImage');
+    const slideTitle = document.getElementById('slideTitle');
+    const slideDesc = document.getElementById('slideDesc');
+    const slideTags = document.getElementById('slideTags');
+    const slideActions = document.getElementById('slideActions');
+    const dotsContainer = document.getElementById('dots');
+    const autoplayToggle = document.getElementById('autoplayToggle');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let currentIndex = 0;
+    let autoplay = false;
+    let autoplayInterval = null;
+    const AUTOPLAY_MS = 4000;
+
+    // create dots
+    projects.forEach((p, idx) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (idx === 0 ? ' active' : '');
+      d.dataset.index = idx;
+      d.addEventListener('click', () => goToSlide(idx));
+      dotsContainer.appendChild(d);
+    });
+
+    function renderSlide(i){
+      const p = projects[i];
+      slideImage.src = p.img;
+      slideImage.alt = p.title;
+      slideTitle.textContent = p.title;
+      slideDesc.textContent = p.desc;
+
+      slideTags.innerHTML = '';
+      p.tags.forEach(t => {
+        const el = document.createElement('span');
+        el.className = 'tag';
+        el.textContent = t;
+        slideTags.appendChild(el);
+      });
+
+      slideActions.innerHTML = '';
+      const demo = document.createElement('a');
+      demo.className = 'btn';
+      demo.href = '#'; demo.target = "_blank";
+      demo.textContent = 'View Demo';
+      slideActions.appendChild(demo);
+
+      const codeBtn = document.createElement('a');
+      codeBtn.className = 'btn secondary';
+      codeBtn.href = 'https://github.com/vickymvignesh56-arch'; codeBtn.target = "_blank";
+      codeBtn.textContent = 'Source';
+      slideActions.appendChild(codeBtn);
+
+      document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+      const activeDot = document.querySelector(`.dot[data-index="${i}"]`);
+      if(activeDot) activeDot.classList.add('active');
+    }
+
+    function goToSlide(i){
+      if(i < 0) i = projects.length - 1;
+      if(i >= projects.length) i = 0;
+      currentIndex = i;
+      renderSlide(currentIndex);
+      resetAutoplay();
+    }
+
+    prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+    autoplayToggle.addEventListener('click', () => {
+      autoplay = !autoplay;
+      autoplayToggle.textContent = autoplay ? 'Auto-play ON' : 'Auto-play OFF';
+      if(autoplay) startAutoplay(); else stopAutoplay();
+    });
+
+    function startAutoplay(){
+      stopAutoplay();
+      autoplayInterval = setInterval(() => {
+        goToSlide((currentIndex + 1) % projects.length);
+      }, AUTOPLAY_MS);
+    }
+    function stopAutoplay(){
+      if(autoplayInterval) {
+        clearInterval(autoplayInterval);
+        autoplayInterval = null;
+      }
+    }
+    function resetAutoplay(){
+      if(autoplay){
+        stopAutoplay();
+        startAutoplay();
+      }
+    }
+
+    // initial render
+    renderSlide(0);
+
+    // graceful image fallback
+    slideImage.addEventListener('error', () => {
+      slideImage.style.objectFit = 'contain';
+      slideImage.src = 'data:image/svg+xml;charset=UTF-8,' +
+        encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='500'>
+          <rect width='100%' height='100%' fill='#4a00e0'/>
+          <text x='50%' y='50%' fill='#ffd7a6' font-family='Poppins, sans-serif' font-size='20' text-anchor='middle'>Replace image path: ${projects[currentIndex].img}</text>
+        </svg>`);
+    });
+
+    // keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if(e.key === 'ArrowLeft') goToSlide(currentIndex - 1);
+      if(e.key === 'ArrowRight') goToSlide(currentIndex + 1);
+    });
+
+
+  </script>
+
+</body>
+</html>

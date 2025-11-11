@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vignesh — Resume App (Starter)</title>
+  <style>
+    :root{
+      --accent:#0b6cf0;
+      --bg:#f6f8fb;
+      --card:#fff;
+      --muted:#666;
+    }
+    body{font-family:Inter,system-ui,Segoe UI,Helvetica,Arial; background:var(--bg); margin:0; padding:24px; color:#111;}
+    .container{max-width:900px; margin:0 auto;}
+    .card{background:var(--card); border-radius:12px; padding:20px; box-shadow:0 6px 18px rgba(20,20,40,0.06);}
+    .row{display:flex; gap:20px;}
+    .left{flex:1 1 320px;}
+    .right{flex:2 1 560px;}
+    header{display:flex; align-items:center; gap:16px;}
+    img.avatar{width:84px; height:84px; border-radius:10px; object-fit:cover; background:#ddd;}
+    h1{margin:0;font-size:22px;}
+    .muted{color:var(--muted); font-size:14px;}
+    .section{margin-top:18px;}
+    .skill{display:inline-block; background:#f0f6ff; color:var(--accent); padding:6px 10px; border-radius:999px; margin:6px 6px 0 0; font-size:13px;}
+    .controls{display:flex; gap:10px; margin-top:12px;}
+    button{background:var(--accent); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;}
+    button.ghost{background:transparent; color:var(--accent); border:1px solid rgba(11,108,240,0.12);}
+    label{display:block; font-size:13px; margin-top:8px;}
+    input, textarea{width:100%; padding:8px; border-radius:8px; border:1px solid #e6e9ef; margin-top:6px; font-size:14px;}
+    textarea{min-height:80px; resize:vertical;}
+    .flex-between{display:flex; justify-content:space-between; align-items:center;}
+    @media (max-width:800px){
+      .row{flex-direction:column;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="row">
+        <div class="left">
+          <header class="flex-between">
+            <div>
+              <img src="" id="photo" class="avatar" alt="avatar" />
+            </div>
+            <div style="flex:1;margin-left:6px;">
+              <h1 id="displayName">Your Name</h1>
+              <div class="muted" id="displayTitle">Your Title • Location</div>
+              <div style="margin-top:8px;" id="contact">email • phone • github</div>
+            </div>
+          </header>
+
+          <div class="section">
+            <h3>Skills</h3>
+            <div id="skillsWrap"></div>
+          </div>
+
+          <div class="section">
+            <h3>About</h3>
+            <div id="displayAbout" class="muted">Short summary about you.</div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="flex-between">
+            <h2 style="margin:0;">Resume Builder</h2>
+            <div class="controls">
+              <button id="editBtn">Edit</button>
+              <button class="ghost" id="saveBtn">Save</button>
+              <button id="pdfBtn">Download PDF</button>
+            </div>
+          </div>
+
+          <div id="editor" class="section" style="display:none;">
+            <label>Name<input id="name" placeholder="Vignesh"/></label>
+            <label>Title<input id="title" placeholder="Frontend Developer"/></label>
+            <label>Location<input id="location" placeholder="Chennai, India"/></label>
+            <label>Email<input id="email" placeholder="you@example.com"/></label>
+            <label>Phone<input id="phone" placeholder="+91 9XXXXXXXX"/></label>
+            <label>GitHub / LinkedIn<input id="links" placeholder="github.com/yourname"/></label>
+            <label>About<textarea id="about">Short intro about you...</textarea></label>
+            <label>Skills (comma separated)<input id="skills" placeholder="Java, HTML, CSS, JS"/></label>
+            <label>Photo URL<input id="photoURL" placeholder="https://...jpg"/></label>
+          </div>
+
+          <div id="preview" class="section">
+            <h3>Experience & Projects</h3>
+            <div id="experience" class="muted">Add experience in edit mode.</div>
+            <h3 class="section">Education</h3>
+            <div id="education" class="muted">Add education in edit mode.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- html2pdf CDN for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    // Simple app state using localStorage
+    const defaultState = {
+      name: "Vignesh",
+      title: "Web Developer",
+      location: "Chennai, India",
+      email: "you@example.com",
+      phone: "+91 9xxxxxxxxx",
+      links: "github.com/vignesh",
+      about: "I build web apps using HTML, CSS and JavaScript.",
+      skills: ["HTML","CSS","JavaScript"],
+      photoURL: ""
+    };
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem('resume_state');
+        return raw ? JSON.parse(raw) : defaultState;
+      }catch(e){ return defaultState; }
+    }
+
+    function saveState(state){
+      localStorage.setItem('resume_state', JSON.stringify(state));
+      alert('Saved locally!');
+    }
+
+    // DOM refs
+    const state = loadState();
+    const editor = document.getElementById('editor');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const pdfBtn = document.getElementById('pdfBtn');
+
+    // input refs
+    const nameI = document.getElementById('name');
+    const titleI = document.getElementById('title');
+    const locationI = document.getElementById('location');
+    const emailI = document.getElementById('email');
+    const phoneI = document.getElementById('phone');
+    const linksI = document.getElementById('links');
+    const aboutI = document.getElementById('about');
+    const skillsI = document.getElementById('skills');
+    const photoI = document.getElementById('photoURL');
+
+    function render(){
+      const s = loadState();
+      document.getElementById('displayName').innerText = s.name;
+      document.getElementById('displayTitle').innerText = `${s.title} • ${s.location}`;
+      document.getElementById('contact').innerText = `${s.email} • ${s.phone} • ${s.links}`;
+      document.getElementById('displayAbout').innerText = s.about;
+      const skillsWrap = document.getElementById('skillsWrap');
+      skillsWrap.innerHTML = '';
+      (s.skills || []).forEach(sk=>{
+        const d = document.createElement('span'); d.className='skill'; d.innerText = sk;
+        skillsWrap.appendChild(d);
+      });
+      document.getElementById('photo').src = s.photoURL || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="100%" height="100%" fill="%23ddd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23888" font-size="14">Avatar</text></svg>';
+      // preview placeholders
+      document.getElementById('experience').innerText = 'Experience and projects can be added later.';
+      document.getElementById('education').innerText = 'Education info can be added later.';
+
+      // fill editor inputs
+      nameI.value = s.name; titleI.value = s.title; locationI.value = s.location; emailI.value = s.email;
+      phoneI.value = s.phone; linksI.value = s.links; aboutI.value = s.about; skillsI.value = (s.skills||[]).join(', ');
+      photoI.value = s.photoURL;
+    }
+
+    editBtn.addEventListener('click', ()=>{
+      editor.style.display = editor.style.display === 'none' ? 'block' : 'none';
+    });
+
+    saveBtn.addEventListener('click', ()=>{
+      const newState = {
+        name: nameI.value||'',
+        title: titleI.value||'',
+        location: locationI.value||'',
+        email: emailI.value||'',
+        phone: phoneI.value||'',
+        links: linksI.value||'',
+        about: aboutI.value||'',
+        skills: skillsI.value.split(',').map(s=>s.trim()).filter(Boolean),
+        photoURL: photoI.value||''
+      };
+      saveState(newState);
+      render();
+    });
+
+    pdfBtn.addEventListener('click', ()=>{
+      // generate PDF of the card
+      const element = document.querySelector('.card');
+      const opt = {
+        margin:       0.3,
+        filename:     (state.name || 'resume') + '.pdf',
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    });
+
+    // initial render
+    render();
+  </script>
+</body>
+</html>
